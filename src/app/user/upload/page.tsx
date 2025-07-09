@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle, Trash2 } from "lucide-react";
 
@@ -18,10 +18,25 @@ export default function UploadPage() {
     text_length: number;
   } | null>(null);
 
+  // Hydrate from localStorage if already uploaded
+  useEffect(() => {
+    const sid = localStorage.getItem("tabasco-session-id");
+    const fname = localStorage.getItem("tabasco-filename");
+    const tlen = localStorage.getItem("tabasco-text-length");
+
+    if (sid && fname && tlen) {
+      setUploadMeta({
+        session_id: sid,
+        filename: fname,
+        text_length: parseInt(tlen),
+      });
+      setUploadSuccess(true);
+    }
+  }, []);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const uploadedFile = e.target.files?.[0] ?? null;
     setFile(uploadedFile);
-    // reset if previously uploaded
     setUploadSuccess(false);
     setUploadMeta(null);
   };
@@ -46,6 +61,8 @@ export default function UploadPage() {
       const data = json.data;
 
       localStorage.setItem("tabasco-session-id", data.session_id);
+      localStorage.setItem("tabasco-filename", data.filename);
+      localStorage.setItem("tabasco-text-length", data.text_length.toString());
 
       setUploadSuccess(true);
       setUploadMeta({
@@ -66,6 +83,8 @@ export default function UploadPage() {
     setUploadSuccess(false);
     setUploadMeta(null);
     localStorage.removeItem("tabasco-session-id");
+    localStorage.removeItem("tabasco-filename");
+    localStorage.removeItem("tabasco-text-length");
   };
 
   const handleContinue = () => {

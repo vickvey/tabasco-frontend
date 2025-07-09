@@ -1,0 +1,1 @@
+- Fix the `/user/cluster` page on the frontend. As it does some api calls on some not existing routes, which are currently left there as placeholder routes.
