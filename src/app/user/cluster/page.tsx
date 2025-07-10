@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import Plot from "react-plotly.js";
 
 interface PlotInfo {
   cluster: number;
-  path: string;
+  words: string[];
+  distances: number[];
   stats: {
     mean: number;
     median: number;
@@ -16,9 +18,15 @@ interface PlotInfo {
   };
 }
 
+interface Summary {
+  cluster_id?: number;
+  top_words: [string, number][];
+  sentences: string[];
+}
+
 export default function ClusterPage() {
   const router = useRouter();
-  const [summaries, setSummaries] = useState<string[][]>([]);
+  const [summaries, setSummaries] = useState<Summary[]>([]);
   const [plots, setPlots] = useState<PlotInfo[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,6 +43,16 @@ export default function ClusterPage() {
       ? localStorage.getItem("tabasco-selected-noun")
       : null;
 
+  const optimalK =
+    typeof window !== "undefined"
+      ? parseInt(localStorage.getItem("tabasco-optimal-k") || "3")
+      : 3;
+
+  const frequencyLimit =
+    typeof window !== "undefined"
+      ? parseInt(localStorage.getItem("tabasco-frequency") || "100")
+      : 100;
+
   useEffect(() => {
     if (!sessionId || !filename || !targetNoun) {
       toast.error("Missing data. Please start over.");
@@ -48,30 +66,22 @@ export default function ClusterPage() {
       formData.append("session_id", sessionId);
       formData.append("filename", filename);
       formData.append("target_word", targetNoun);
-      formData.append("frequency_limit", "100");
-      formData.append("num_clusters", "3");
+      formData.append("frequency_limit", frequencyLimit.toString());
+      formData.append("num_clusters", optimalK.toString());
 
       try {
-        // Fetch summaries
         const summaryRes = await fetch("/api/v1/reports/generate-summary", {
           method: "POST",
           body: formData,
         });
 
         const summaryJson = await summaryRes.json();
-        if (!summaryRes.ok || !summaryJson.data?.summary_files) {
+        if (!summaryRes.ok || !summaryJson.data?.summaries) {
           throw new Error(summaryJson.detail || "Failed to get summaries");
         }
 
-        const summariesData = await Promise.all(
-          summaryJson.data.summary_files.map(async (path: string) => {
-            const res = await fetch(`/api/static/${path}`);
-            return (await res.text()).split("\n");
-          })
-        );
-        setSummaries(summariesData);
+        setSummaries(summaryJson.data.summaries);
 
-        // Fetch threshold plots
         const plotRes = await fetch(
           "/api/v1/reports/generate-threshold-plots",
           {
@@ -81,11 +91,11 @@ export default function ClusterPage() {
         );
 
         const plotJson = await plotRes.json();
-        if (!plotRes.ok || !plotJson.data?.plot_paths) {
+        if (!plotRes.ok || !plotJson.data?.plot_data) {
           throw new Error(plotJson.detail || "Failed to get threshold plots");
         }
 
-        setPlots(plotJson.data.plot_paths);
+        setPlots(plotJson.data.plot_data);
       } catch (err) {
         console.error(err);
         toast.error("Failed to load clustering data.");
@@ -95,10 +105,22 @@ export default function ClusterPage() {
     };
 
     fetchData();
-  }, [sessionId, filename, targetNoun]);
+  }, [sessionId, filename, targetNoun, optimalK, frequencyLimit]);
 
   const handleBack = () => router.push("/user/elbow");
   const handleNext = () => router.push("/user/report");
+
+  const handleDownloadSummary = () => {
+    const blob = new Blob([JSON.stringify(summaries, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "summary_report.json";
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="space-y-8">
@@ -118,19 +140,34 @@ export default function ClusterPage() {
         <p className="text-muted-foreground">Loading clustering results...</p>
       ) : (
         <>
-          {summaries.map((lines, idx) => (
+          {summaries.map((summary, idx) => (
             <Card key={idx}>
               <CardHeader>
-                <CardTitle>Cluster {idx + 1}</CardTitle>
+                <CardTitle>Cluster {summary.cluster_id ?? idx + 1}</CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="text-sm space-y-1 line-clamp-6">
-                  {lines.slice(0, 6).map((line, i) => (
-                    <p key={i} className="text-muted-foreground">
-                      {line}
-                    </p>
-                  ))}
-                  {lines.length > 6 && (
+              <CardContent className="space-y-3">
+                <div>
+                  <h3 className="font-semibold text-sm mb-1">Top Words</h3>
+                  <ul className="text-sm text-muted-foreground grid grid-cols-2 gap-x-4">
+                    {summary.top_words.slice(0, 10).map(([word, score], i) => (
+                      <li key={i}>
+                        <span className="font-medium">{word}</span>{" "}
+                        <span className="text-xs">({score.toFixed(3)})</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold text-sm mb-1">
+                    Sample Sentences
+                  </h3>
+                  <ul className="text-sm text-muted-foreground space-y-1">
+                    {summary.sentences.slice(0, 5).map((sentence, i) => (
+                      <li key={i}>• {sentence}</li>
+                    ))}
+                  </ul>
+                  {summary.sentences.length > 5 && (
                     <Button
                       variant="link"
                       className="px-0 text-primary"
@@ -146,6 +183,12 @@ export default function ClusterPage() {
             </Card>
           ))}
 
+          <div className="flex justify-end mt-2">
+            <Button variant="outline" onClick={handleDownloadSummary}>
+              ⬇ Download Summary Report
+            </Button>
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
             {plots.map((plot) => (
               <Card key={plot.cluster}>
@@ -155,10 +198,24 @@ export default function ClusterPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <img
-                    src={`/api/static/${plot.path}`}
-                    alt={`Threshold plot cluster ${plot.cluster}`}
-                    className="w-full h-auto border rounded"
+                  <Plot
+                    data={[
+                      {
+                        x: plot.words,
+                        y: plot.distances,
+                        type: "scatter",
+                        mode: "markers",
+                        marker: { color: "#4f46e5" },
+                      },
+                    ]}
+                    layout={{
+                      title: `Cosine Similarity of Context Words`,
+                      xaxis: { title: "Context Word" },
+                      yaxis: { title: "Cosine Similarity" },
+                      height: 300,
+                      margin: { t: 40, b: 60, l: 50, r: 10 },
+                    }}
+                    style={{ width: "100%" }}
                   />
                   <div className="text-sm text-muted-foreground space-y-1">
                     <div>Mean: {plot.stats.mean.toFixed(3)}</div>

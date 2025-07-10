@@ -88,6 +88,10 @@ export default function ElbowPage() {
   };
 
   const handleContinue = () => {
+    if (elbowData) {
+      localStorage.setItem("tabasco-optimal-k", elbowData.optimal_k);
+      localStorage.setItem("tabasco-frequency", frequency.toString());
+    }
     router.push("/user/cluster");
   };
 
