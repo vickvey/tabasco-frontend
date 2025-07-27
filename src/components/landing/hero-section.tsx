@@ -23,7 +23,7 @@ export default function HeroSection() {
             intra-domain ambiguities
           </span>{" "}
           in your technical corpus. Know exactly when and where your terms are
-          used inconsistently — before they cause confusion.
+          used inconsistently - before they cause confusion.
         </p>
 
         <div className="flex gap-4">

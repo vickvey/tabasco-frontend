@@ -66,7 +66,7 @@ function HeroTrail() {
 
 export default function Header() {
   return (
-    <header className="sticky z-50 top-5 backdrop-blur-lg border-b border-border shadow-sm flex justify-between lg:px-4 lg:py-2 items-center rounded-full">
+    <header className=" sticky z-50 top-5 backdrop-blur-lg border-b border-border shadow-sm flex justify-between lg:px-4 lg:py-2 items-center rounded-full">
       <HeroHeader />
       <NavBar />
       <HeroTrail />
