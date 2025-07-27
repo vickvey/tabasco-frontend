@@ -3,6 +3,7 @@
 
 import { usePathname } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
+import { ToggleTheme } from "@/components/toggle-theme";
 
 const steps = ["upload", "nouns", "elbow", "cluster", "report"];
 
@@ -22,7 +23,10 @@ function SessionProgress() {
         </span>
         <span>{percentage}%</span>
       </div>
-      <Progress value={percentage} />
+      <div className="flex items-center space-x-6">
+        <Progress value={percentage} />
+        <ToggleTheme />
+      </div>
     </div>
   );
 }

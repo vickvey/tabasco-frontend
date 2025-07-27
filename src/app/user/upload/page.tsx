@@ -1,95 +1,20 @@
+// page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { CheckCircle, Trash2 } from "lucide-react";
+import { useUpload } from "@/hooks";
+import { UploadForm } from "@/components/custom/upload-form";
+import { UploadSuccessAlert } from "@/components/custom/upload-success-alert";
 
 export default function UploadPage() {
-  const router = useRouter();
-  const [file, setFile] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-  const [uploadMeta, setUploadMeta] = useState<{
-    session_id: string;
-    filename: string;
-    text_length: number;
-  } | null>(null);
-
-  // Hydrate from localStorage if already uploaded
-  useEffect(() => {
-    const sid = localStorage.getItem("tabasco-session-id");
-    const fname = localStorage.getItem("tabasco-filename");
-    const tlen = localStorage.getItem("tabasco-text-length");
-
-    if (sid && fname && tlen) {
-      setUploadMeta({
-        session_id: sid,
-        filename: fname,
-        text_length: parseInt(tlen),
-      });
-      setUploadSuccess(true);
-    }
-  }, []);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const uploadedFile = e.target.files?.[0] ?? null;
-    setFile(uploadedFile);
-    setUploadSuccess(false);
-    setUploadMeta(null);
-  };
-
-  const handleUpload = async () => {
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    setLoading(true);
-
-    try {
-      const res = await fetch("/api/v1/general/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) throw new Error("Upload failed");
-
-      const json = await res.json();
-      const data = json.data;
-
-      localStorage.setItem("tabasco-session-id", data.session_id);
-      localStorage.setItem("tabasco-filename", data.filename);
-      localStorage.setItem("tabasco-text-length", data.text_length.toString());
-
-      setUploadSuccess(true);
-      setUploadMeta({
-        session_id: data.session_id,
-        filename: data.filename,
-        text_length: data.text_length,
-      });
-    } catch (err) {
-      console.error(err);
-      alert("Upload failed. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDiscard = () => {
-    setFile(null);
-    setUploadSuccess(false);
-    setUploadMeta(null);
-    localStorage.removeItem("tabasco-session-id");
-    localStorage.removeItem("tabasco-filename");
-    localStorage.removeItem("tabasco-text-length");
-  };
-
-  const handleContinue = () => {
-    router.push("/user/nouns");
-  };
+  const {
+    file,
+    setFile,
+    loading,
+    uploadSuccess,
+    uploadMeta,
+    handleUpload,
+    handleDiscard,
+  } = useUpload();
 
   return (
     <div className="space-y-6">
@@ -99,46 +24,16 @@ export default function UploadPage() {
       </p>
 
       {!uploadSuccess && (
-        <div className="flex items-center gap-4">
-          <Input type="file" accept=".pdf,.txt" onChange={handleFileChange} />
-          <Button onClick={handleUpload} disabled={!file || loading}>
-            {loading ? "Uploading..." : "Upload"}
-          </Button>
-        </div>
+        <UploadForm
+          onFileChange={setFile}
+          onUpload={handleUpload}
+          disabled={!file || loading}
+          loading={loading}
+        />
       )}
 
       {uploadSuccess && uploadMeta && (
-        <Alert className="bg-green-50 border-green-400">
-          <CheckCircle className="h-5 w-5 text-green-600" />
-          <AlertTitle className="text-green-700">Upload Successful</AlertTitle>
-          <AlertDescription>
-            <div className="text-sm mt-1 text-foreground">
-              <div>
-                <strong>File:</strong> {uploadMeta.filename}
-              </div>
-              <div>
-                <strong>Session ID:</strong>{" "}
-                <code className="bg-muted px-1 py-0.5 rounded text-xs">
-                  {uploadMeta.session_id}
-                </code>
-              </div>
-              <div>
-                <strong>Text Length:</strong> {uploadMeta.text_length} chars
-              </div>
-            </div>
-            <div className="flex gap-4 mt-4">
-              <Button onClick={handleContinue}>Continue</Button>
-              <Button
-                variant="destructive"
-                className="flex items-center gap-2"
-                onClick={handleDiscard}
-              >
-                <Trash2 className="h-4 w-4" />
-                Discard & Re-upload
-              </Button>
-            </div>
-          </AlertDescription>
-        </Alert>
+        <UploadSuccessAlert meta={uploadMeta} onDiscard={handleDiscard} />
       )}
     </div>
   );

@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TABASCO",
-  description: "An BERT-based text contextualization web app",
+  description: "An NLP based text contextualization web app",
 };
 
 export default function RootLayout({
