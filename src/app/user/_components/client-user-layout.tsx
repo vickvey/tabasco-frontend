@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { Progress } from "@/components/ui/progress";
 import { ToggleTheme } from "@/components/toggle-theme";
 
-const steps = ["upload", "nouns", "elbow", "cluster", "report"];
+const steps = ["upload", "nouns", "target-sentences", "cluster", "report"];
 
 function SessionProgress() {
   const pathname = usePathname();

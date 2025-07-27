@@ -60,7 +60,7 @@ export function useTopNouns() {
     navigator.clipboard.writeText(noun);
     localStorage.setItem(STORAGE_KEYS.selectedNoun, noun);
     toast.success(`Selected noun "${noun}" copied to clipboard.`);
-    router.push("/user/elbow");
+    router.push("/user/target-sentences");
   };
 
   useEffect(() => {
