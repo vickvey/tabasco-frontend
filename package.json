@@ -2,6 +2,11 @@
   "name": "tabasco-frontend",
   "version": "0.1.0",
   "private": true,
+  "author": {
+    "name": "Vivek Kumar",
+    "email": "vivek.indie.dev@gmail.com",
+    "url": "https://vickvey.vercel.app"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
