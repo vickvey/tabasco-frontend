@@ -38,7 +38,7 @@ export function useTopNouns() {
       formData.append("filename", filename);
       formData.append("top_n", String(topN));
 
-      const res = await fetch("/api/v1/top-nouns", {
+      const res = await fetch("/api/v1/general/top-nouns", {
         method: "POST",
         body: formData,
       });
@@ -60,7 +60,7 @@ export function useTopNouns() {
     navigator.clipboard.writeText(noun);
     localStorage.setItem(STORAGE_KEYS.selectedNoun, noun);
     toast.success(`Selected noun "${noun}" copied to clipboard.`);
-    router.push("/user/target-sentences");
+    router.push("/user/elbow");
   };
 
   useEffect(() => {

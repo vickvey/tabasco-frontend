@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TABASCO",
+  title: "Modern TABASCO",
   description: "An NLP based text contextualization web app",
 };
 

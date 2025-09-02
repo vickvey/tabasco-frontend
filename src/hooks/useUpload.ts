@@ -44,7 +44,7 @@ export function useUpload() {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/v1/upload", {
+      const res = await fetch("/api/v1/general/upload", {
         method: "POST",
         body: formData,
       });
