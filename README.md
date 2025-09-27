@@ -31,7 +31,11 @@ It is designed to work together with the [Modern TABASCO backend](https://github
 ## 📖 Credits / Acknowledgements
 
 - Original **TABASCO v1.1** (2022) by [a-moharil](https://github.com/a-moharil), under MIT License.
-- Frontend re-engineering (2025) by **Vivek Kumar**.
+- Research published in:
+  > A. Moharil & A. Sharma, _“TABASCO: A transformer based contextualization toolkit”_,  
+  > _Science of Computer Programming_, 2023.  
+  > DOI: [10.1016/j.scico.2023.102994](https://doi.org/10.1016/j.scico.2023.102994)
+- Frontend re-engineering for Modern TABASCO (2025) by **Vivek Kumar**.
 
 ---
 
