@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TABASCO Frontend (Modern TABASCO)
 
-## Getting Started
+This is the **Next.js + React (TypeScript, shadcn/ui)** frontend for  
+[Modern TABASCO](https://github.com/vickvey/modern-tabasco).
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🚀 About
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Modern TABASCO is a re-engineered version of the original [TABASCO](https://github.com/a-moharil/tabasco) (2022) created by **a-moharil** and collaborators.  
+The **original idea and research belong to them**.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This frontend is **only an engineering upgrade** of their work, replacing the original Flask + HTML/CSS interface with:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- ⚡ **Next.js (React 19 + TypeScript)**
+- 🎨 **shadcn/ui + TailwindCSS** for modern styling
+- 📊 **Chart.js, Recharts, Plotly.js** for visualizations
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## ⚠️ Usage
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+This repository **cannot be used standalone**.  
+It is designed to work together with the [Modern TABASCO backend](https://github.com/vickvey/tabasco-backend).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+👉 To use the application, please visit the **main repo**:  
+[Modern TABASCO](https://github.com/vickvey/modern-tabasco)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📖 Credits / Acknowledgements
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Original **TABASCO v1.1** (2022) by [a-moharil](https://github.com/a-moharil), under MIT License.
+- Frontend re-engineering (2025) by **Vivek Kumar**.
+
+---
+
+## 📜 License
+
+Licensed under the **MIT License**, with attribution to both authors.  
+See the [LICENSE](./LICENSE) file for details.
